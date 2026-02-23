@@ -1,0 +1,30 @@
+
+   .container {
+       display: flex;
+       height: calc(100vh - 60px);
+   }
+
+   .sidebar {
+       width: 200px;
+       background-color: #1a1a3d;
+       padding: 20px;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+   }
+
+   .sidebar-btn {
+       background-color: #4b2e83;
+       color: white;
+       border: none;
+       padding: 10px;
+       margin: 10px 0;
+       width: 100%;
+       cursor: pointer;
+       border-radius: 5px;
+   }
+
+   .sidebar-btn:hover {
+       background-color: #8a4af3;
+   }
+   

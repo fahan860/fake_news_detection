@@ -1,0 +1,121 @@
+
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Fake News Detection</title>
+       <link rel="stylesheet" href="header.css">
+       <link rel="stylesheet" href="sidebar.css">
+       <link rel="stylesheet" href="body.css">
+   </head>
+   <body>
+       <header>
+           <div class="logo">
+            <img src="fake1.png" alt="Logo">
+               <span>FAKE NEWS DETECTION</span>
+           </div>
+           <div class="user-info">
+               <span id="username">user name</span>
+               <button class="logout-btn" onclick="logout()">Logout</button>
+           </div>
+       </header>
+       <div class="container">
+           <div class="sidebar">
+               <button class="sidebar-btn" onclick="fetchNews()">Fetch News</button>
+           </div>
+           <div class="main-content">
+               <textarea id="news-input" placeholder="Enter your news ici....."></textarea>
+               <div class="button-group">
+                   <button class="action-btn" onclick="uploadImage()">Upload Image</button>
+                   <input type="text" id="url-input" placeholder="URL">
+                   <button class="action-btn" onclick="detectFakeNews()">Submit</button>
+               </div>
+               <div id="result"></div>
+           </div>
+       </div>
+       <script>
+           async function checkAuth() {
+               try {
+                   const response = await fetch('/api/check_auth', {
+                       method: 'GET',
+                       credentials: 'include'
+                   });
+                   const result = await response.json();
+                   if (!response.ok) {
+                       window.location.href = '/index.html';
+                   } else {
+                       document.getElementById('username').textContent = result.username;
+                   }
+               } catch (error) {
+                   window.location.href = '/index.html';
+               }
+           }
+
+           async function logout() {
+               try {
+                   await fetch('/api/logout', {
+                       method: 'POST',
+                       credentials: 'include'
+                   });
+                   window.location.href = '/index.html';
+               } catch (error) {
+                   alert('Error: ' + error.message);
+               }
+           }
+
+           async function fetchNews() {
+               const query = prompt("Enter news query (e.g., politics):");
+               if (!query) return;
+
+               try {
+                   const response = await fetch('/api/fetch_news', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ query })
+                   });
+                   const result = await response.json();
+                   if (response.ok) {
+                       const resultDiv = document.getElementById('result');
+                       resultDiv.innerHTML = result.data.map(item => `<p>${item.title}: ${item.prediction} (Confidence: ${item.confidence}%)</p>`).join('');
+                   } else {
+                       alert(result.message);
+                   }
+               } catch (error) {
+                   alert('Error: ' + error.message);
+               }
+           }
+
+           function uploadImage() {
+               alert("Image upload functionality not implemented yet.");
+           }
+
+           async function detectFakeNews() {
+               const text = document.getElementById('news-input').value;
+               if (!text) {
+                   alert("Please enter a news headline.");
+                   return;
+               }
+
+               try {
+                   const response = await fetch('/api/detect', {
+                       method: 'POST',
+                       headers: { 'Content-Type': 'application/json' },
+                       body: JSON.stringify({ text })
+                   });
+                   const result = await response.json();
+                   if (response.ok) {
+                       document.getElementById('result').innerHTML = `Result: ${result.prediction} (Confidence: ${result.confidence}%)`;
+                   } else {
+                       alert(result.message);
+                   }
+               } catch (error) {
+                   alert('Error: ' + error.message);
+               }
+           }
+
+           window.onload = checkAuth;
+       </script>
+   </body>
+   </html>
+   
